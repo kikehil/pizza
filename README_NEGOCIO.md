@@ -28,6 +28,13 @@ El sistema no es solo una "cara bonita", incluye una infraestructura de datos di
 -   **Framer Motion** para micro-interacciones de clase mundial.
 -   **Socket.io + Node.js** para comunicación en tiempo real entre cliente, cocina y administración.
 
+## 🏁 Fase de Lanzamiento (Hype)
+El sistema incluye una **Landing Page de Lanzamiento** diseñada para capturar leads de WhatsApp antes de la inauguración. Incluye un contador regresivo y una oferta irresistible de 50% de descuento para los primeros registros.
+-   *Acceso:* `/lanzamiento`
+
+## 📦 Despliegue en VPS
+Para poner el sistema en producción, consulta la [GUIA_DESPLIEGUE_VPS.md](./GUIA_DESPLIEGUE_VPS.md). Cubre la instalación de PostgreSQL, Node.js, PM2 y Nginx con SSL.
+
 
 ---
 *Desarrollado con ❤️ para Pizza Cerebro.*
