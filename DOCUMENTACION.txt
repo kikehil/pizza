@@ -1,0 +1,51 @@
+Especificaciones Técnicas: Ecosistema "Pizza Cerebro" v2.0
+Propuesta: Sistema Integral de Ventas, Logística y Gestión de Datos.
+
+1. Módulos y Funcionalidades Actualizadas
+🟢 Módulo del Cliente (Ventas High-Conversion)
+Smart Checkout con Geolocalización: Botón nativo que obtiene las coordenadas GPS del dispositivo y realiza reverse geocoding para llenar la dirección automáticamente.
+
+Persistencia de Perfil: Almacenamiento en LocalStorage para recordar nombre, teléfono y dirección, reduciendo el proceso de compra a segundos en clientes recurrentes.
+
+Personalización dinámca: Modal de "Extras" que permite añadir ingredientes u orillas de queso con actualización de precio en tiempo real.
+
+🔴 Módulo de Cocina (KDS - Kitchen Display System)
+Gestión de Urgencia en Tiempo Real: Interfaz de bajo brillo (modo oscuro para fatiga visual) con temporizadores automáticos que cambian de color (Verde > Amarillo > Rojo) según el tiempo de espera.
+
+Sincronización Total: Comunicación vía WebSockets para recibir pedidos sin recargar el navegador.
+
+🔵 Módulo de Reparto (Logística Móvil)
+Navegación In-App (Modal): Mapa integrado mediante Leaflet/Google Maps que permite al repartidor ver la ruta y el punto de entrega sin salir de la aplicación.
+
+Comunicación de Un Toque: Botones directos para llamar al cliente o abrir navegación externa si es necesario.
+
+Aviso Automático: Al iniciar el reparto, el sistema dispara un mensaje de WhatsApp al cliente informando: "Tu pizza está en camino".
+
+🟡 Módulo Admin (Gestión Operativa y Financiera)
+Centro de Reportes PDF: Generación de documentos descargables con métricas de ventas, IVA y tiempos promedio de entrega.
+
+Control de Inventario Instantáneo: Interruptores (Switches) para habilitar o deshabilitar productos del menú según disponibilidad.
+
+Seguridad por Roles: Acceso restringido con autenticación para proteger los datos sensibles del negocio.
+
+2. Plan de Negocio Estratégico
+Para que el dueño del negocio vea esto como una inversión y no como un gasto, te sugiero proponer estos tres pilares:
+
+A. Estrategia de Retención (Programa de Lealtad)
+Implementación: Dado que ya guardamos los datos del cliente, podemos implementar un "Monedero Pizza".
+
+Funcionamiento: Por cada $100 de compra, el sistema acumula un 5% en saldo para su próximo pedido.
+
+Impacto: Esto incentiva a usar tu plataforma en lugar de llamar por teléfono o usar apps de terceros.
+
+B. Optimización del Ticket Promedio (Up-selling Guiado)
+Implementación: Configurar el modal de personalización para que aparezca obligatoriamente antes de añadir al carrito.
+
+Funcionamiento: Ofrecer "combos" o "extras" (Dips, postres, refrescos) de bajo costo pero alto margen de ganancia.
+
+Impacto: Aumentar el valor de cada venta entre un 15% y 20% mediante sugerencias automáticas.
+
+C. Reducción de Costos Operativos (Bye Bye Comisiones)
+Comparativa: Mostrar al dueño la diferencia entre pagar el 30% de comisión a UberEats vs. el costo fijo mensual de su propio servidor (que es mínimo).
+
+Funcionamiento: Utilizar el ahorro de comisiones para ofrecer "Envío Gratis" solo a través de la web oficial, moviendo a los clientes de las apps externas a la plataforma propia.
