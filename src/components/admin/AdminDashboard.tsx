@@ -12,7 +12,7 @@ import ReportsModule from './ReportsModule';
 import Login from './Login';
 import { pizzas as initialPizzas, Pizza } from '@/data/menu';
 
-import { getSocket } from '@/lib/socket';
+import { getSocket, API_URL } from '@/lib/socket';
 
 const AdminDashboard = () => {
     const [isAuth, setIsAuth] = React.useState(false);
