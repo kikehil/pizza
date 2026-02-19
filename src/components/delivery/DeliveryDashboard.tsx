@@ -7,7 +7,6 @@ import io from 'socket.io-client';
 import { cn } from '@/lib/utils';
 import MapModal from './MapModal';
 
-const socket = io('http://localhost:3001');
 
 interface DeliveryOrder {
     id: string;
@@ -22,7 +21,14 @@ interface DeliveryOrder {
 }
 
 const DeliveryDashboard = () => {
+    const [socket, setSocket] = useState<any>(null);
     const [pedidosListos, setPedidosListos] = useState<DeliveryOrder[]>([]);
+
+    useEffect(() => {
+        const newSocket = io('http://localhost:3001');
+        setSocket(newSocket);
+        return () => { newSocket.close(); };
+    }, []);
     const [selectedOrder, setSelectedOrder] = useState<DeliveryOrder | null>(null);
     const [isMapOpen, setIsMapOpen] = useState(false);
     const [currentPos, setCurrentPos] = useState<{ lat: number, lng: number } | undefined>(undefined);
@@ -40,6 +46,7 @@ const DeliveryDashboard = () => {
     }, []);
 
     useEffect(() => {
+        if (!socket) return;
         // Escuchar cuando cocina marca un pedido como "Listo"
         socket.on('pedido_listo_reparto', (pedido: DeliveryOrder) => {
             console.log("¡Nuevo pedido para repartir!", pedido);
@@ -60,10 +67,10 @@ const DeliveryDashboard = () => {
             socket.off('pedido_listo_reparto');
             socket.off('pedido_entregado_remoto');
         };
-    }, []);
+    }, [socket]);
 
     const marcarEntregado = (id: string) => {
-        socket.emit('confirmar_entrega', id);
+        if (socket) socket.emit('confirmar_entrega', id);
         setPedidosListos(prev => prev.filter(p => p.id !== id));
         if (selectedOrder?.id === id) setIsMapOpen(false);
     };

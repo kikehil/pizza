@@ -7,12 +7,6 @@ import 'leaflet/dist/leaflet.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Navigation, MapPin } from 'lucide-react';
 
-// Fix for default marker icons
-const icon = L.icon({
-    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
 
 interface MapModalProps {
     isOpen: boolean;
@@ -40,7 +34,20 @@ function MapViewUpdater({ center }: { center: [number, number] }) {
 const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, destination, currentPos }) => {
     if (!isOpen) return null;
 
+    // Fix for default marker icons
+    const icon = L.icon({
+        iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    });
+
     const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${destination.lat},${destination.lng}`;
+
+    const handleOpenExternal = () => {
+        if (typeof window !== 'undefined') {
+            window.open(googleMapsUrl, '_blank');
+        }
+    };
 
     return (
         <AnimatePresence>
@@ -104,7 +111,7 @@ const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, destination, curre
                             <p className="text-sm font-bold text-slate-900 leading-tight mb-4">{destination.address}</p>
 
                             <button
-                                onClick={() => window.open(googleMapsUrl, '_blank')}
+                                onClick={handleOpenExternal}
                                 className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black italic uppercase tracking-widest transition-all shadow-lg shadow-blue-600/30 flex items-center justify-center gap-3 group active:scale-95"
                             >
                                 <Navigation size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
