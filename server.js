@@ -197,8 +197,13 @@ app.get('/api/admin/stats', authenticateJWT, async (req, res) => {
             LIMIT 3
         `);
 
+        const pedidosHoy = await db.query(
+            "SELECT COUNT(*) as count FROM pedidos WHERE created_at >= CURRENT_DATE"
+        );
+
         res.json({
             revenueToday: parseFloat(ventasHoy.rows[0].total),
+            orderCount: parseInt(pedidosHoy.rows[0].count),
             topThree: topPizzas.rows
         });
     } catch (err) {

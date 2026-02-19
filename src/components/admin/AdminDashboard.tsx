@@ -18,8 +18,8 @@ const AdminDashboard = () => {
     const [isAuth, setIsAuth] = React.useState(false);
     const [activeTab, setActiveTab] = React.useState<'stats' | 'products' | 'promos' | 'settings' | 'reports'>('stats');
     const [products, setProducts] = React.useState<Pizza[]>(initialPizzas);
-    const [dailyRevenue, setDailyRevenue] = React.useState(12450);
-    const [orderCount, setOrderCount] = React.useState(42);
+    const [dailyRevenue, setDailyRevenue] = React.useState(0);
+    const [orderCount, setOrderCount] = React.useState(0);
     const [recentOrders, setRecentOrders] = React.useState<any[]>([]);
     const [chartData, setChartData] = React.useState([
         { dia: 'Lun', ventas: 4000 },
@@ -33,9 +33,28 @@ const AdminDashboard = () => {
 
     React.useEffect(() => {
         const socket = getSocket();
-        if (!socket) return;
 
-        setChartData(prev => prev.map(d => d.dia === 'Hoy' ? { ...d, ventas: dailyRevenue } : d));
+        // Cargar estadísticas reales al entrar
+        const fetchStats = async () => {
+            const token = localStorage.getItem('adminToken');
+            if (!token) return;
+            try {
+                const res = await fetch(`${API_URL}/api/admin/stats`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.revenueToday !== undefined) {
+                    setDailyRevenue(data.revenueToday);
+                    setOrderCount(data.orderCount || 0);
+                    // Actualizar gráfica si es hoy
+                    setChartData(prev => prev.map(d => d.dia === 'Hoy' ? { ...d, ventas: data.revenueToday } : d));
+                }
+            } catch (e) { console.error("Error al cargar stats:", e); }
+        };
+
+        if (isAuth) fetchStats();
+
+        if (!socket) return;
 
         socket.on('nuevo_pedido', (pedido: any) => {
             console.log("Admin recibiendo pedido:", pedido);
