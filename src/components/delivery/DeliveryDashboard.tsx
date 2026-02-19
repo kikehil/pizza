@@ -6,7 +6,7 @@ import { MapPin, Phone, CheckCircle2, Package, Clock, Navigation } from 'lucide-
 import { cn } from '@/lib/utils';
 import { RepartidorMap } from './MapIndex';
 
-import { getSocket } from '@/lib/socket';
+import { getSocket, API_URL } from '@/lib/socket';
 
 
 interface DeliveryOrder {
@@ -19,6 +19,7 @@ interface DeliveryOrder {
     timestamp: string;
     lat?: number;
     lng?: number;
+    order_id: string;
 }
 
 const DeliveryDashboard = () => {
@@ -46,7 +47,13 @@ const DeliveryDashboard = () => {
         // Escuchar cuando cocina marca un pedido como "Listo"
         socket.on('pedido_listo_reparto', (pedido: DeliveryOrder) => {
             console.log("¡Nuevo pedido para repartir!", pedido);
-            setPedidosListos(prev => [pedido, ...prev]);
+            setPedidosListos(prev => [
+                {
+                    ...pedido,
+                    order_id: pedido.order_id || pedido.id
+                },
+                ...prev
+            ]);
 
             // Vibración si está en móvil
             if ("vibrate" in navigator) {
@@ -65,11 +72,22 @@ const DeliveryDashboard = () => {
         };
     }, []);
 
-    const marcarEntregado = (id: string) => {
-        const socket = getSocket();
-        if (socket) socket.emit('confirmar_entrega', id);
-        setPedidosListos(prev => prev.filter(p => p.id !== id));
-        if (selectedOrder?.id === id) setIsMapOpen(false);
+    const marcarEntregado = async (id: string) => {
+        const order = pedidosListos.find(p => p.id === id);
+        if (!order) return;
+
+        try {
+            await fetch(`${API_URL}/api/pedidos/${order.order_id || id}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'entregado' })
+            });
+            setPedidosListos(prev => prev.filter(p => p.id !== id));
+            if (selectedOrder?.id === id) setIsMapOpen(false);
+        } catch (error) {
+            console.error("Error al entregar pedido:", error);
+            alert("Error al conectar con el servidor.");
+        }
     };
 
     const handleOpenMap = async (pedido: DeliveryOrder) => {

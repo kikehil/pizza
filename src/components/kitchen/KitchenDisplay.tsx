@@ -12,9 +12,10 @@ interface KitchenOrder {
     timestamp: string;
     status: 'pending' | 'preparing' | 'ready';
     total: number;
+    order_id: string; // Add order_id for API calls
 }
 
-import { getSocket } from '@/lib/socket';
+import { getSocket, API_URL } from '@/lib/socket';
 import OrderCard from './OrderCard';
 
 const KitchenDisplay = () => {
@@ -40,6 +41,7 @@ const KitchenDisplay = () => {
             setOrders(prev => [
                 {
                     ...pedido,
+                    order_id: pedido.order_id || pedido.id, // Ensure we have the string ID
                     createdAt: pedido.createdAt || new Date().toISOString(),
                     status: 'pending'
                 },
@@ -64,13 +66,21 @@ const KitchenDisplay = () => {
         };
     }, []);
 
-    const completeOrder = (id: string) => {
-        const socket = getSocket();
+    const completeOrder = async (id: string) => {
         const order = orders.find(o => o.id === id);
-        if (order && socket) {
-            socket.emit('pedido_listo_reparto', order);
+        if (!order) return;
+
+        try {
+            await fetch(`${API_URL}/api/pedidos/${order.order_id || id}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'listo' })
+            });
+            setOrders(prev => prev.filter(o => o.id !== id));
+        } catch (error) {
+            console.error("Error al completar pedido:", error);
+            alert("Error al conectar con el servidor.");
         }
-        setOrders(prev => prev.filter(o => o.id !== id));
     };
 
     return (
