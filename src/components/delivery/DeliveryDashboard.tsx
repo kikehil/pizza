@@ -3,9 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Phone, CheckCircle2, Package, Clock, Navigation } from 'lucide-react';
-import io from 'socket.io-client';
 import { cn } from '@/lib/utils';
-import MapModal from './MapModal';
+import { RepartidorMap } from './MapIndex';
+
+let io: any;
+if (typeof window !== 'undefined') {
+    io = require('socket.io-client').default;
+}
 
 
 interface DeliveryOrder {
@@ -25,9 +29,11 @@ const DeliveryDashboard = () => {
     const [pedidosListos, setPedidosListos] = useState<DeliveryOrder[]>([]);
 
     useEffect(() => {
-        const newSocket = io('http://localhost:3001');
-        setSocket(newSocket);
-        return () => { newSocket.close(); };
+        if (typeof window !== 'undefined' && io) {
+            const newSocket = io('http://localhost:3001');
+            setSocket(newSocket);
+            return () => { newSocket.close(); };
+        }
     }, []);
     const [selectedOrder, setSelectedOrder] = useState<DeliveryOrder | null>(null);
     const [isMapOpen, setIsMapOpen] = useState(false);
@@ -213,7 +219,7 @@ const DeliveryDashboard = () => {
             </main>
 
             {selectedOrder && (
-                <MapModal
+                <RepartidorMap
                     isOpen={isMapOpen}
                     onClose={() => setIsMapOpen(false)}
                     destination={{

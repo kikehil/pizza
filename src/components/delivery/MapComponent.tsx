@@ -31,7 +31,7 @@ function MapViewUpdater({ center }: { center: [number, number] }) {
     return null;
 }
 
-const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, destination, currentPos }) => {
+const MapComponent: React.FC<MapModalProps> = ({ isOpen, onClose, destination, currentPos }) => {
     if (!isOpen) return null;
 
     // Fix for default marker icons
@@ -125,4 +125,4 @@ const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, destination, curre
     );
 };
 
-export default MapModal;
+export default MapComponent;
