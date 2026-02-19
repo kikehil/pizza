@@ -24,6 +24,7 @@ interface DeliveryOrder {
 
 const DeliveryDashboard = () => {
     const [pedidosListos, setPedidosListos] = useState<DeliveryOrder[]>([]);
+    const [socketConnected, setSocketConnected] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<DeliveryOrder | null>(null);
     const [isMapOpen, setIsMapOpen] = useState(false);
     const [currentPos, setCurrentPos] = useState<{ lat: number, lng: number } | undefined>(undefined);
@@ -65,6 +66,18 @@ const DeliveryDashboard = () => {
         const socket = getSocket();
         if (!socket) return;
 
+        setSocketConnected(socket.connected);
+
+        socket.on('connect', () => {
+            console.log("✅ Socket REP conectado");
+            setSocketConnected(true);
+        });
+
+        socket.on('disconnect', () => {
+            console.log("❌ Socket REP desconectado");
+            setSocketConnected(false);
+        });
+
         // Escuchar cuando cocina marca un pedido como "Listo"
         socket.on('pedido_listo_reparto', (pedido: DeliveryOrder) => {
             console.log("🚛 REPARTIDOR: Recibido pedido listo", pedido);
@@ -96,6 +109,8 @@ const DeliveryDashboard = () => {
         });
 
         return () => {
+            socket.off('connect');
+            socket.off('disconnect');
             socket.off('pedido_listo_reparto');
             socket.off('pedido_entregado_remoto');
         };
@@ -148,8 +163,12 @@ const DeliveryDashboard = () => {
             <header className="bg-slate-950 text-white p-6 pt-12 rounded-b-[2.5rem] shadow-2xl sticky top-0 z-50">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h2 className="text-2xl font-black italic tracking-tighter uppercase leading-none">Reparto <span className="text-red-600">Flash</span></h2>
-                        <p className="text-slate-500 font-bold text-[10px] uppercase tracking-widest mt-2">Módulo de Repartidor</p>
+                        <h1 className="text-3xl font-black uppercase tracking-tighter italic">Reparto <span className="text-red-600">Flash</span></h1>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Módulo de Repartidor</p>
+                        <div className="flex items-center gap-2 mt-1">
+                            <div className={cn("w-2 h-2 rounded-full", socketConnected ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" : "bg-red-500 animate-pulse")} />
+                            <span className="text-[10px] font-bold text-slate-400 uppercase">{socketConnected ? 'Conectado' : 'Sin Conexión'}</span>
+                        </div>
                     </div>
                     <div className="flex flex-col items-end">
                         <span className="bg-red-600 px-3 py-1 rounded-full text-[10px] font-black animate-pulse uppercase">
