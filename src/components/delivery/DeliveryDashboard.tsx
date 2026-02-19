@@ -29,7 +29,28 @@ const DeliveryDashboard = () => {
     const [currentPos, setCurrentPos] = useState<{ lat: number, lng: number } | undefined>(undefined);
 
     useEffect(() => {
-        // Track driver's position
+        // 1. Cargar pedidos que ya están listos
+        const fetchInitialOrders = async () => {
+            try {
+                const res = await fetch(`${API_URL}/api/pedidos/status/listo`);
+                const data = await res.json();
+                if (Array.isArray(data)) {
+                    setPedidosListos(data.map(p => ({
+                        ...p,
+                        order_id: p.order_id || p.id,
+                        // El backend devuelve los campos de DB, mapeamos si es necesario
+                        id: p.order_id || p.id.toString(),
+                        timestamp: p.timestamp || new Date(p.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    })));
+                }
+            } catch (e) {
+                console.error("Error cargando pedidos iniciales:", e);
+            }
+        };
+
+        fetchInitialOrders();
+
+        // 2. Track driver's position
         if ("geolocation" in navigator) {
             const watchId = navigator.geolocation.watchPosition(
                 (pos) => setCurrentPos({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
@@ -46,14 +67,22 @@ const DeliveryDashboard = () => {
 
         // Escuchar cuando cocina marca un pedido como "Listo"
         socket.on('pedido_listo_reparto', (pedido: DeliveryOrder) => {
-            console.log("¡Nuevo pedido para repartir!", pedido);
-            setPedidosListos(prev => [
-                {
-                    ...pedido,
-                    order_id: pedido.order_id || pedido.id
-                },
-                ...prev
-            ]);
+            console.log("🚛 REPARTIDOR: Recibido pedido listo", pedido);
+            setPedidosListos(prev => {
+                // Evitar duplicados si ya lo cargamos vía fetch
+                const exists = prev.find(p => p.order_id === (pedido.order_id || pedido.id));
+                if (exists) return prev;
+
+                return [
+                    {
+                        ...pedido,
+                        order_id: pedido.order_id || pedido.id,
+                        id: pedido.order_id || pedido.id.toString(),
+                        timestamp: pedido.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    },
+                    ...prev
+                ];
+            });
 
             // Vibración si está en móvil
             if ("vibrate" in navigator) {

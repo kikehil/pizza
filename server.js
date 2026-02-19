@@ -144,6 +144,29 @@ app.post('/api/pedidos', async (req, res) => {
     }
 });
 
+app.get('/api/pedidos/status/:status', async (req, res) => {
+    const { status } = req.params;
+    try {
+        const result = await db.query(
+            'SELECT * FROM pedidos WHERE status = $1 ORDER BY created_at DESC',
+            [status]
+        );
+
+        // Cargar items para cada pedido para que el repartidor los vea
+        const pedidosConItems = await Promise.all(result.rows.map(async (pedido) => {
+            const itemsRes = await db.query(
+                'SELECT pizza_nombre as nombre, cantidad as quantity FROM detalle_pedidos WHERE pedido_id = $1',
+                [pedido.id]
+            );
+            return { ...pedido, items: itemsRes.rows };
+        }));
+
+        res.json(pedidosConItems);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.patch('/api/pedidos/:id/status', async (req, res) => {
     const { id } = req.params; // order_id string
     const { status } = req.body;
@@ -171,7 +194,13 @@ app.patch('/api/pedidos/:id/status', async (req, res) => {
                 'SELECT pizza_nombre as nombre, cantidad as quantity FROM detalle_pedidos WHERE pedido_id = $1',
                 [pedido.id]
             );
-            io.emit('pedido_listo_reparto', { ...pedido, items: itemsRes.rows });
+            const fullPedido = {
+                ...pedido,
+                order_id: pedido.order_id,
+                items: itemsRes.rows
+            };
+            console.log("📢 Emitiendo pedido a repartidores:", fullPedido.order_id);
+            io.emit('pedido_listo_reparto', fullPedido);
         } else if (status === 'entregado') {
             io.emit('pedido_entregado_remoto', id);
         }
