@@ -1,6 +1,11 @@
 'use client';
 
-import DeliveryDashboard from '@/components/delivery/DeliveryDashboard';
+import dynamic from 'next/dynamic';
+
+const DeliveryDashboard = dynamic(
+    () => import('@/components/delivery/DeliveryDashboard'),
+    { ssr: false }
+);
 
 export default function RepartidorPage() {
     return (
