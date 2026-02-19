@@ -90,6 +90,13 @@ server {
         proxy_cache_bypass $http_upgrade;
     }
 
+    location /api/ {
+        proxy_pass http://localhost:3001; # Backend API
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
     location /socket.io/ {
         proxy_pass http://localhost:3001; # Backend Sockets
         proxy_http_version 1.1;

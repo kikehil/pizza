@@ -12,9 +12,9 @@ import CheckoutModal from '@/components/cart/CheckoutModal';
 import PromoSlider from '@/components/layout/PromoSlider';
 import NotificationToast, { NotificationType } from '@/components/ui/NotificationToast';
 import { Pizza as PizzaIcon, Phone, MapPin, Clock } from 'lucide-react';
-import io from 'socket.io-client';
+import { getSocket } from '@/lib/socket';
 
-const socket = io('http://localhost:3001');
+const API_URL = process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}` : 'http://localhost:3001');
 
 export default function Home() {
   const [menu, setMenu] = useState<Pizza[]>(initialPizzas);
@@ -25,6 +25,9 @@ export default function Home() {
   const [isOrdering, setIsOrdering] = useState(false);
 
   useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
+
     // Escuchar actualizaciones globales del menú (ej. cuando el admin apaga una pizza)
     socket.on('menu_actualizado', (updatedMenu: Pizza[]) => {
       console.log("Menú actualizado recibido en cliente:", updatedMenu);
@@ -97,7 +100,7 @@ export default function Home() {
     };
 
     try {
-      const response = await fetch('http://localhost:3001/api/pedidos', {
+      const response = await fetch(`${API_URL}/api/pedidos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(pedido)

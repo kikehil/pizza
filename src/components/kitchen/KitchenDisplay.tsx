@@ -14,15 +14,16 @@ interface KitchenOrder {
     total: number;
 }
 
-import io from 'socket.io-client';
+import { getSocket } from '@/lib/socket';
 import OrderCard from './OrderCard';
-
-const socket = io('http://localhost:3001');
 
 const KitchenDisplay = () => {
     const [orders, setOrders] = useState<KitchenOrder[]>([]);
 
     useEffect(() => {
+        const socket = getSocket();
+        if (!socket) return;
+
         // Escuchar nuevos pedidos desde el Bridge Server
         socket.on('nuevo_pedido', (pedido: any) => {
             console.log("¡Nuevo pedido recibido!", pedido);
@@ -64,8 +65,9 @@ const KitchenDisplay = () => {
     }, []);
 
     const completeOrder = (id: string) => {
+        const socket = getSocket();
         const order = orders.find(o => o.id === id);
-        if (order) {
+        if (order && socket) {
             socket.emit('pedido_listo_reparto', order);
         }
         setOrders(prev => prev.filter(o => o.id !== id));

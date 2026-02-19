@@ -12,7 +12,7 @@ import ReportsModule from './ReportsModule';
 import Login from './Login';
 import { pizzas as initialPizzas, Pizza } from '@/data/menu';
 
-const socket = io('http://localhost:3001');
+import { getSocket } from '@/lib/socket';
 
 const AdminDashboard = () => {
     const [isAuth, setIsAuth] = React.useState(false);
@@ -32,6 +32,9 @@ const AdminDashboard = () => {
     ]);
 
     React.useEffect(() => {
+        const socket = getSocket();
+        if (!socket) return;
+
         setChartData(prev => prev.map(d => d.dia === 'Hoy' ? { ...d, ventas: dailyRevenue } : d));
 
         socket.on('nuevo_pedido', (pedido: any) => {
@@ -60,7 +63,8 @@ const AdminDashboard = () => {
         setProducts(newProducts);
 
         // Emit to all clients via Bridge Server
-        socket.emit('actualizar_menu', newProducts);
+        const socket = getSocket();
+        if (socket) socket.emit('actualizar_menu', newProducts);
     };
 
     if (!isAuth) {
