@@ -22,12 +22,12 @@ const AdminDashboard = () => {
     const [orderCount, setOrderCount] = React.useState(0);
     const [recentOrders, setRecentOrders] = React.useState<any[]>([]);
     const [chartData, setChartData] = React.useState([
-        { dia: 'Lun', ventas: 4000 },
-        { dia: 'Mar', ventas: 3000 },
-        { dia: 'Mie', ventas: 2000 },
-        { dia: 'Jue', ventas: 6000 },
-        { dia: 'Vie', ventas: 8000 },
-        { dia: 'Sab', ventas: 9500 },
+        { dia: 'Lun', ventas: 0 },
+        { dia: 'Mar', ventas: 0 },
+        { dia: 'Mie', ventas: 0 },
+        { dia: 'Jue', ventas: 0 },
+        { dia: 'Vie', ventas: 0 },
+        { dia: 'Sab', ventas: 0 },
         { dia: 'Hoy', ventas: 0 },
     ]);
 
