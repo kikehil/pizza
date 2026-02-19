@@ -11,7 +11,7 @@ async function cleanDatabase() {
         console.log('--- 🧹 INICIANDO LIMPIEZA DE BASE DE DATOS ---');
 
         // El orden es importante por las llaves foráneas
-        await client.query('DELETE FROM extra_pedidos');
+        await client.query('DELETE FROM extras_pedidos');
         console.log('✅ Extras de pedidos eliminados.');
 
         await client.query('DELETE FROM detalle_pedidos');
