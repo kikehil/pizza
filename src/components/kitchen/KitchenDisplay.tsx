@@ -142,9 +142,12 @@ const KitchenDisplay = () => {
                 <div className="flex items-center gap-6">
                     <img src="/img/capriccio-logo.svg" alt="Logo" className="w-24 h-24 drop-shadow-lg" />
                     <div>
-                        <h1 className="text-4xl font-title font-black italic uppercase tracking-widest text-white leading-none">
-                            CENTRO DE <span className="text-capriccio-gold">COCINA</span>
-                        </h1>
+                        <div className="flex items-center gap-3">
+                            <h1 className="text-4xl font-title font-black italic uppercase tracking-widest text-white leading-none">
+                                CENTRO DE <span className="text-capriccio-gold">COCINA</span>
+                            </h1>
+                            <span className="bg-capriccio-gold/20 text-capriccio-gold text-[10px] font-black px-2 py-0.5 rounded-full border border-capriccio-gold/30">V2.1</span>
+                        </div>
                         <p className="text-slate-500 font-medium italic mt-2">Gestión de Pedidos en Tiempo Real</p>
                     </div>
                 </div>

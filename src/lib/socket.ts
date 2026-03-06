@@ -5,13 +5,9 @@ const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001'
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ||
     (typeof window !== 'undefined'
         ? (
-            // Si estamos en localhost o usando el puerto de desarrollo 3000, apuntamos al backend en 3001
             (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.port === '3000')
                 ? `${window.location.protocol}//${window.location.hostname}:3001`
-                // Si el hostname parece una IP (contiene al menos un punto y solo dígitos y puntos), usamos el puerto 3001
-                : (/^\d{1,3}(\.\d{1,3}){3}$/.test(window.location.hostname)
-                    ? `${window.location.protocol}//${window.location.hostname}:3001`
-                    : `${window.location.protocol}//${window.location.hostname}`)
+                : `${window.location.protocol}//${window.location.hostname}`
         )
         : 'http://localhost:3001');
 
