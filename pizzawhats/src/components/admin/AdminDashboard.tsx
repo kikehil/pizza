@@ -11,14 +11,13 @@ import ProductManager from './ProductManager';
 import PromotionManager from './PromotionManager';
 import ReportsModule from './ReportsModule';
 import UserManager from './UserManager';
-import SettlementManager from './SettlementManager';
 import Login from './Login';
 import { pizzas as initialPizzas, Pizza } from '@/data/menu';
 
 import { getSocket, API_URL } from '@/lib/socket';
 
 const AdminDashboard = () => {
-    const [activeTab, setActiveTab] = React.useState<'stats' | 'products' | 'promos' | 'settings' | 'reports' | 'users' | 'corte'>('stats');
+    const [activeTab, setActiveTab] = React.useState<'stats' | 'products' | 'promos' | 'settings' | 'reports' | 'users'>('stats');
     const [products, setProducts] = React.useState<Pizza[]>(initialPizzas);
     const [dailyRevenue, setDailyRevenue] = React.useState(0);
     const [orderCount, setOrderCount] = React.useState(0);
@@ -105,9 +104,6 @@ const AdminDashboard = () => {
         }
         if (activeTab === 'promos') {
             return <PromotionManager />;
-        }
-        if (activeTab === 'corte') {
-            return <SettlementManager />;
         }
 
         if (activeTab === 'stats') {

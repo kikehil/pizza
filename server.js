@@ -557,6 +557,59 @@ app.get('/api/admin/reportes', authenticateJWT, async (req, res) => {
     }
 });
 
+// --- API CORTE DE CAJA (SETTLEMENT) ---
+// Obtener pedidos entregados pero no liquidados para el corte por repartidor
+app.get('/api/admin/corte-caja', authenticateJWT, async (req, res) => {
+    try {
+        const result = await db.query(`
+            SELECT 
+                repartidor,
+                COUNT(*) as total_pedidos,
+                SUM(total) as total_efectivo,
+                json_agg(
+                    json_build_object(
+                        'id', id,
+                        'order_id', order_id,
+                        'cliente_nombre', cliente_nombre,
+                        'total', total,
+                        'delivered_at', delivered_at
+                    )
+                ) as pedidos
+            FROM pedidos 
+            WHERE status = 'entregado' AND liquidado = false
+            GROUP BY repartidor
+        `);
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Liquidar (cerrar corte) de una lista de pedidos
+app.patch('/api/admin/liquidar-pedidos', authenticateJWT, async (req, res) => {
+    const { order_ids, liquidado_por } = req.body; // array de strings (order_id)
+    
+    if (!order_ids || !Array.isArray(order_ids) || order_ids.length === 0) {
+        return res.status(400).json({ error: 'Lista de pedidos vacía' });
+    }
+
+    try {
+        const result = await db.query(
+            'UPDATE pedidos SET liquidado = true, liquidado_at = CURRENT_TIMESTAMP, liquidado_por = $1 WHERE order_id = ANY($2) RETURNING *',
+            [liquidado_por || 'Cajero Admin', order_ids]
+        );
+        
+        console.log(`💰 [LIQUIDACIÓN] ${result.rowCount} pedidos liquidados por ${liquidado_por}`);
+        
+        // Notificar al admin dashboard para actualizar métricas si es necesario
+        io.emit('pedidos_liquidados', { order_ids, count: result.rowCount });
+        
+        res.json({ success: true, count: result.rowCount });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // --- SOCKETS ---
 let repartidoresOnline = {}; // { socketId: { nombre, id } }
 
