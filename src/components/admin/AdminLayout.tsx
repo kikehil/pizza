@@ -40,7 +40,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeTab, setActiv
             )}>
                 <div className="flex flex-col items-center mb-12">
                     <img src="/img/capriccio-logo.svg" alt="Logo" className="w-40 h-auto drop-shadow-xl mb-4" />
-                    <span className="text-capriccio-gold text-xs font-black tracking-[0.3em] uppercase border-y border-capriccio-gold/20 py-1">Panel Admin</span>
+                    <span className="text-capriccio-gold text-xs font-black tracking-[0.3em] uppercase border-y border-capriccio-gold/20 py-1">Panel Admin v2</span>
                 </div>
 
                 <nav className="space-y-3">
