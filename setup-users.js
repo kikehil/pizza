@@ -26,21 +26,21 @@ const setupUsers = async () => {
         await db.query(`
             INSERT INTO usuarios (username, password, role, nombre_completo)
             VALUES ('admin', $1, 'admin', 'Administrador General')
-            ON CONFLICT (username) DO NOTHING
+            ON CONFLICT (username) DO UPDATE SET password = EXCLUDED.password
         `, [adminPass]);
 
         // Cocina
         await db.query(`
             INSERT INTO usuarios (username, password, role, nombre_completo)
             VALUES ('cocina', $1, 'cocina', 'Personal de Cocina')
-            ON CONFLICT (username) DO NOTHING
+            ON CONFLICT (username) DO UPDATE SET password = EXCLUDED.password
         `, [cocinaPass]);
 
         // Repartidor Demo
         await db.query(`
             INSERT INTO usuarios (username, password, role, nombre_completo)
             VALUES ('repartidor1', $1, 'repartidor', 'Juan Repartidor')
-            ON CONFLICT (username) DO NOTHING
+            ON CONFLICT (username) DO UPDATE SET password = EXCLUDED.password
         `, [repartidorPass]);
 
         console.log('✅ Tabla de usuarios configurada correctamente');
