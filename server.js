@@ -41,16 +41,16 @@ app.post('/api/auth/login', async (req, res) => {
     const { username, password, role_request } = req.body;
 
     try {
-        // Buscar usuario en DB
-        const result = await db.query('SELECT * FROM usuarios WHERE username = $1 AND role = $2 AND activo = true', [username, role_request]);
+        // Buscar usuario en DB (insensible a mayúsculas para username)
+        const result = await db.query('SELECT * FROM usuarios WHERE LOWER(username) = LOWER($1) AND role = $2 AND activo = true', [username, role_request]);
 
         if (result.rows.length === 0) {
             // Fallback para admin/cocina si no se ha corrido el script de usuarios aún
             const ADMIN_PASS = process.env.ADMIN_PASS || 'CapriccioAdmin2026!';
             const COCINA_PASS = process.env.COCINA_PASS || 'CocinaCap2026!';
 
-            if (role_request === 'admin' && username === 'admin' && password === ADMIN_PASS) {
-                const token = jwt.sign({ username, role: 'admin' }, JWT_SECRET, { expiresIn: '7d' });
+            if (role_request === 'admin' && username?.toLowerCase() === 'admin' && password === ADMIN_PASS) {
+                const token = jwt.sign({ username: 'admin', role: 'admin' }, JWT_SECRET, { expiresIn: '7d' });
                 return res.json({ token, role: 'admin' });
             }
             if (role_request === 'cocina' && password === COCINA_PASS) {
